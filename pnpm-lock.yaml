@@ -33,7 +33,7 @@ importers:
       lint-staged: 11.2.3
       lodash: 4.17.21
       minimist: 1.2.5
-      pnpm: 6.17.0
+      pnpm: 6.17.1
       prettier: 2.4.1
       prettier-eslint-cli: 5.0.1
       rimraf: 3.0.2
@@ -74,7 +74,7 @@ importers:
       lint-staged: 11.2.3
       lodash: 4.17.21
       minimist: 1.2.5
-      pnpm: 6.17.0
+      pnpm: 6.17.1
       prettier: 2.4.1
       prettier-eslint-cli: 5.0.1
       rimraf: 3.0.2
@@ -6194,7 +6194,7 @@ packages:
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
     dependencies:
-      '@vue/cli-service': 4.5.13_typescript@4.4.3
+      '@vue/cli-service': 4.5.13_daaec740214156bd7a1b7d7855d908a4
       '@vue/cli-shared-utils': 4.5.13
     dev: true
 
@@ -6210,7 +6210,7 @@ packages:
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
     dependencies:
-      '@vue/cli-service': 4.5.13_typescript@4.4.3
+      '@vue/cli-service': 4.5.13_daaec740214156bd7a1b7d7855d908a4
     dev: true
 
   /@vue/cli-service/4.4.6_daaec740214156bd7a1b7d7855d908a4:
@@ -16724,8 +16724,8 @@ packages:
     transitivePeerDependencies:
       - typescript
 
-  /pnpm/6.17.0:
-    resolution: {integrity: sha512-EgwdelfAtv5ld5J9vYLqgBjPeqjjr298o9nkVW7prT8aUFLsVet2rIP8FjdTBk7ApYDldJ2HWTkmp0qGqf1ONA==}
+  /pnpm/6.17.1:
+    resolution: {integrity: sha512-rxl28iv4zYrhv7hKRMfO49hlXMFGQDgDyJrAoLkQPlJuAziCjEdfMV0OTt5BsntxbQMLsGgwpqSfosNVMbCdNQ==}
     engines: {node: '>=12.17'}
     hasBin: true
     dev: true

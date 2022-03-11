@@ -1,10 +1,15 @@
-import { EventEmitter2 } from 'eventemitter2';
 import { Loader } from '@garfish/loader';
-import { SyncHook, AsyncHook, PluginSystem } from '@garfish/hooks';
+import { EventEmitter2 } from 'eventemitter2';
 import { warn, assert, isPlainObject, __GARFISH_FLAG__ } from '@garfish/utils';
 import {
+  SyncHook,
+  AsyncHook,
+  SyncWaterfallHook,
+  AsyncWaterfallHook,
+  PluginSystem,
+} from '@garfish/hooks';
+import {
   deepMergeConfig,
-  filterNestedConfig,
   generateAppOptions,
   createDefaultOptions,
 } from './config';
@@ -17,9 +22,13 @@ import { GarfishOptionsLife } from './plugins/lifecycle';
 import { GarfishPreloadPlugin } from './plugins/preload';
 import { GarfishPerformance } from './plugins/performance';
 
-let numberOfNesting = 0;
 const DEFAULT_PROPS = new WeakMap();
-const HOOKS_API = { SyncHook, AsyncHook };
+const HOOKS_API = {
+  SyncHook,
+  AsyncHook,
+  SyncWaterfallHook,
+  AsyncWaterfallHook,
+};
 
 export class Garfish extends EventEmitter2 {
   public running = false;
@@ -35,7 +44,6 @@ export class Garfish extends EventEmitter2 {
   public cacheApps: Record<string, interfaces.App> = {};
   public appInfos: Record<string, interfaces.AppInfo> = {};
 
-  private nestedSwitch = false;
   private loading: Record<string, Promise<any> | null> = {};
 
   get props(): Record<string, any> {
@@ -52,7 +60,7 @@ export class Garfish extends EventEmitter2 {
     this.usePlugin(GarfishPreloadPlugin());
   }
 
-  private setOptions(options: Partial<interfaces.Options>) {
+  setOptions(options: Partial<interfaces.Options>) {
     assert(!this.running, 'Garfish is running, can`t set options');
     if (isPlainObject(options)) {
       this.options = deepMergeConfig(this.options, options);
@@ -69,9 +77,7 @@ export class Garfish extends EventEmitter2 {
     plugin: (context: Garfish) => interfaces.Plugin,
     ...args: Array<any>
   ) {
-    if (!this.nestedSwitch) {
-      assert(!this.running, 'Cannot register plugin after Garfish is started.');
-    }
+    assert(!this.running, 'Cannot register plugin after Garfish is started.');
     assert(typeof plugin === 'function', 'Plugin must be a function.');
     args.unshift(this);
     const pluginConfig = plugin.apply(null, args) as interfaces.Plugin;
@@ -89,36 +95,7 @@ export class Garfish extends EventEmitter2 {
 
   run(options: interfaces.Options = {}) {
     if (this.running) {
-      // Nested scene can be repeated registration application
-      if (options.nested) {
-        numberOfNesting++;
-        const mainOptions = createDefaultOptions(true);
-        options = deepMergeConfig(mainOptions, options);
-        options = filterNestedConfig(this, options, numberOfNesting);
-
-        this.nestedSwitch = true;
-        options.plugins?.forEach((plugin) => this.usePlugin(plugin));
-        // `pluginName` is unique
-        this.usePlugin(
-          GarfishOptionsLife(options, `nested-lifecycle-${numberOfNesting}`),
-        );
-        this.nestedSwitch = false;
-
-        if (options.apps) {
-          this.registerApp(
-            options.apps.map((appInfo) => {
-              const appConf = deepMergeConfig<interfaces.AppInfo>(
-                options,
-                appInfo,
-              );
-              appConf.nested = numberOfNesting;
-              // Now we only allow the same sandbox configuration to be used globally
-              appConf.sandbox = this.options.sandbox;
-              return appConf;
-            }),
-          );
-        }
-      } else if (__DEV__) {
+      if (__DEV__) {
         warn('Garfish is already running now, Cannot run Garfish repeatedly.');
       }
       return this;
@@ -176,7 +153,7 @@ export class Garfish extends EventEmitter2 {
     return this;
   }
 
-  async loadApp(
+  loadApp(
     appName: string,
     optionsOrUrl?: Omit<interfaces.AppInfo, 'name'>,
   ): Promise<interfaces.App | null> {

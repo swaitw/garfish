@@ -1,4 +1,4 @@
-import { parseQuery } from './utils/urlUt';
+import { getPath, parseQuery } from './utils/urlUt';
 import { createEvent } from './utils';
 import {
   RouterConfig,
@@ -25,32 +25,33 @@ export const normalAgent = () => {
 
     const rewrite = function (type: keyof History) {
       const hapi = history[type];
-      return function () {
+      return function (this: History) {
         const urlBefore = window.location.pathname + window.location.hash;
         const stateBefore = history?.state;
-        const res = hapi.apply(this as any, arguments);
+        const res = hapi.apply(this, arguments);
         const urlAfter = window.location.pathname + window.location.hash;
         const stateAfter = history?.state;
 
         const e = createEvent(type);
         (e as any).arguments = arguments;
 
-        if (urlBefore !== urlAfter || stateBefore !== stateAfter) {
-          if (history.state && history.state === 'object')
-            delete history.state[__GARFISH_ROUTER_UPDATE_FLAG__];
+        if (
+          urlBefore !== urlAfter ||
+          JSON.stringify(stateBefore) !== JSON.stringify(stateAfter)
+        ) {
           window.dispatchEvent(
             new CustomEvent(__GARFISH_BEFORE_ROUTER_EVENT__, {
               detail: {
                 toRouterInfo: {
                   fullPath: urlAfter,
                   query: parseQuery(location.search),
-                  path: urlAfter,
+                  path: getPath(RouterConfig.basename!, urlAfter),
                   state: stateAfter,
                 },
                 fromRouterInfo: {
                   fullPath: urlBefore,
                   query: parseQuery(location.search),
-                  path: urlBefore,
+                  path: getPath(RouterConfig.basename!, urlBefore),
                   state: stateBefore,
                 },
                 eventType: type,
@@ -73,7 +74,7 @@ export const normalAgent = () => {
         // Stop trigger collection function, fire again match rendering
         if (event && typeof event === 'object' && (event as any).garfish)
           return;
-        if (history.state && history.state === 'object')
+        if (history.state && typeof history.state === 'object')
           delete history.state[__GARFISH_ROUTER_UPDATE_FLAG__];
         window.dispatchEvent(
           new CustomEvent(__GARFISH_BEFORE_ROUTER_EVENT__, {
@@ -81,11 +82,14 @@ export const normalAgent = () => {
               toRouterInfo: {
                 fullPath: location.pathname,
                 query: parseQuery(location.search),
-                path: location.pathname,
+                path: getPath(RouterConfig.basename!),
               },
               fromRouterInfo: {
                 fullPath: RouterConfig.current!.fullPath,
-                path: RouterConfig.current!.path,
+                path: getPath(
+                  RouterConfig.basename!,
+                  RouterConfig.current!.path,
+                ),
                 query: RouterConfig.current!.query,
               },
               eventType: 'popstate',
@@ -105,7 +109,7 @@ export const initRedirect = () => {
   linkTo({
     toRouterInfo: {
       fullPath: location.pathname,
-      path: location.pathname,
+      path: getPath(RouterConfig.basename!),
       query: parseQuery(location.search),
       state: history.state,
     },

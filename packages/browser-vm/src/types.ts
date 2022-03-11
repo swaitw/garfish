@@ -1,4 +1,5 @@
 import { Sandbox } from './sandbox';
+import type { Node } from '@garfish/utils';
 import type { LoaderOptions } from '@garfish/loader';
 
 export type FakeWindow = Window & Record<PropertyKey, any>;
@@ -20,6 +21,7 @@ export interface ReplaceGlobalVariables {
 export interface SandboxOptions {
   namespace: string;
   baseUrl?: string;
+  fixBaseUrl?: boolean;
   disableWith?: boolean;
   strictIsolation?: boolean;
   modules?: Array<Module>;
@@ -28,9 +30,4 @@ export interface SandboxOptions {
   el?: () => Element | ShadowRoot | null;
   protectVariable?: () => Array<PropertyKey>;
   insulationVariable?: () => Array<PropertyKey>;
-}
-
-export interface ExecScriptOptions {
-  async?: boolean;
-  noEntry?: boolean;
 }

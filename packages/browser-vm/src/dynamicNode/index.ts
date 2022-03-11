@@ -14,7 +14,7 @@ const mountElementMethods = [
 const removeChildElementMethods = ['removeChild'];
 
 function injector(current: Function, methodName: string) {
-  return function () {
+  return function (this: Element) {
     // prettier-ignore
     const el = methodName === 'insertAdjacentElement'
       ? arguments[1]
@@ -27,7 +27,7 @@ function injector(current: Function, methodName: string) {
       if (baseUrl) {
         const manager = new StyleManager(el.textContent);
         manager.correctPath(baseUrl);
-        this.textContent = manager.styleCode;
+        el.textContent = manager.styleCode;
         return originProcess();
       }
     }
@@ -42,7 +42,7 @@ function injector(current: Function, methodName: string) {
 }
 
 function injectorRemoveChild(current: Function, methodName: string) {
-  return function () {
+  return function (this: Element) {
     const el = arguments[0];
     const sandbox = el && sandboxMap.get(el);
     const originProcess = () => {
@@ -127,9 +127,9 @@ export function rebuildCSSRules(
       for (let i = 0; i < cssRules.length; i++) {
         const cssRule = cssRules[i];
         // re-insert rules for styled-components element
-        styleElement.sheet.insertRule(
+        styleElement.sheet?.insertRule(
           cssRule.cssText,
-          styleElement.sheet.cssRules.length,
+          styleElement.sheet?.cssRules.length,
         );
       }
     }

@@ -37,8 +37,8 @@ yarn add garfish
 > The doc site ([Garfish](https://garfish.top/)) is only available in Chinese for now, we are planning to add English versions soon.
 
 - [About Garfish](https://garfish.top/guide)
-- [Quick Start](https://garfish.top/quick-start)
-- [API References](https://garfish.top/api/garfish)
+- [Quick Start](https://garfish.top/quickStart)
+- [API References](https://garfish.top/api)
 
 ## Functionality
 
@@ -63,11 +63,11 @@ yarn add garfish
 
 - Provide business plugins to meet various customization needs of business parties
 
-## community
+## Contributing
 
-[https://garfish.top/community/discuss](https://garfish.top/community/discuss)
+- [Contributing Guide](https://github.com/modern-js-dev/garfish/blob/master/CONTRIBUTING.md)
 
-## credit
+## Credit
 
 - [Qiankun](https://github.com/umijs/qiankun) is a very good micro front-end framework, Garfish sandbox design learned a lot of good ideas
 - [single-spa](https://github.com/single-spa/single-spa) for community raised a hot wave of micro front-end solutions, learned a lot of amazing Garfish routing system design ideas

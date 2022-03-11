@@ -4,7 +4,7 @@
 
 ## Requirement
 
-`Node.js >= 14.13.0`
+`Node.js >= 16.10`
 
 ## Setup (locally)
 
@@ -17,7 +17,7 @@ npm i -g pnpm
 Clone this repo to your local machine and install the dependencies.
 
 ```bash
-pnpm run setup
+pnpm install
 ```
 
 ## Development

@@ -37,8 +37,8 @@ export namespace interfaces {
     | (() => Promise<Element>);
 
   export interface LoaderResult {
-    mount: () => void;
-    unmount: () => void;
+    mount: interfaces.Provider['render'];
+    unmount: interfaces.Provider['destroy'];
   }
 
   export interface AppRenderInfo {
@@ -51,27 +51,32 @@ export namespace interfaces {
       appName,
       dom,
       appRenderInfo,
+      props,
     }: {
       appName: string;
       dom: Element | ShadowRoot | Document;
       appRenderInfo: AppRenderInfo;
+      props: Record<string, any>;
     }) => void;
     render: ({
       appName,
       dom,
       basename,
       appRenderInfo,
+      props,
     }: {
       appName: String;
       dom: Element | ShadowRoot | Document;
       basename: string;
       appRenderInfo: AppRenderInfo;
+      props: Record<string, any>;
     }) => void;
   }
 
   export interface SandboxConfig {
     open?: boolean;
     snapshot?: boolean;
+    fixBaseUrl?: boolean;
     disableWith?: boolean;
     strictIsolation?: boolean;
   }
@@ -126,4 +131,12 @@ export namespace interfaces {
 
   // You can be extended plugin type dynamic registration
   export interface Plugins {}
+
+  export interface ExecScriptOptions {
+    node?: Node;
+    async?: boolean;
+    noEntry?: boolean;
+    isInline?: boolean;
+    isModule?: boolean;
+  }
 }

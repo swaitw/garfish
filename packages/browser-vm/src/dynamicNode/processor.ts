@@ -4,6 +4,7 @@ import {
   warn,
   isJs,
   isCss,
+  isJsonp,
   DOMApis,
   makeMap,
   findTarget,
@@ -13,7 +14,6 @@ import {
   sourceListTags,
   parseContentType,
   __REMOVE_NODE__,
-  isJsonp,
 } from '@garfish/utils';
 import { rootElm } from '../utils';
 import { Sandbox } from '../sandbox';
@@ -53,11 +53,13 @@ export class DynamicNodeProcessor {
       src && (this.el.src = transformUrl(baseUrl, src));
       href && (this.el.href = transformUrl(baseUrl, href));
       const url = this.el.src || this.el.href;
-      url &&
+
+      if (url) {
         this.sandbox.options?.sourceList.push({
           tagName: this.el.tagName,
           url,
         });
+      }
     }
   }
 
@@ -120,29 +122,35 @@ export class DynamicNodeProcessor {
 
   // Load dynamic js script
   private addDynamicScriptNode() {
-    const { src, type } = this.el;
+    const { src, type, crossOrigin } = this.el;
+    const isModule = type === 'module';
     const mimeType = parseContentType(type);
     const code = this.el.textContent || this.el.text || '';
 
-    if (!type || isJs(mimeType) || isJsonp(mimeType, src)) {
+    if (!type || isJs(mimeType) || isModule || isJsonp(mimeType, src)) {
       // The "src" higher priority
       const { baseUrl, namespace = '' } = this.sandbox.options;
       if (src) {
         const fetchUrl = baseUrl ? transformUrl(baseUrl, src) : src;
-        this.sandbox.loader.load<JavaScriptManager>(namespace, fetchUrl).then(
-          ({ resourceManager: { url, scriptCode } }) => {
-            // It is necessary to ensure that the code execution error cannot trigger the `el.onerror` event
-            this.sandbox.execScript(scriptCode, {}, url, { noEntry: true });
-            this.dispatchEvent('load');
-          },
-          (e) => {
-            __DEV__ && warn(e);
-            this.dispatchEvent('error', {
-              error: e,
-              filename: fetchUrl,
-            });
-          },
-        );
+        this.sandbox.loader
+          .load<JavaScriptManager>(namespace, fetchUrl, false, crossOrigin)
+          .then(
+            ({ resourceManager: { url, scriptCode } }) => {
+              // It is necessary to ensure that the code execution error cannot trigger the `el.onerror` event
+              this.sandbox.execScript(scriptCode, {}, url, {
+                isModule,
+                noEntry: true,
+              });
+              this.dispatchEvent('load');
+            },
+            (e) => {
+              __DEV__ && warn(e);
+              this.dispatchEvent('error', {
+                error: e,
+                filename: fetchUrl,
+              });
+            },
+          );
       } else if (code) {
         this.sandbox.execScript(code, {}, baseUrl, { noEntry: true });
       }
@@ -154,14 +162,6 @@ export class DynamicNodeProcessor {
       this.el[__REMOVE_NODE__] = () =>
         this.DOMApis.removeElement(scriptCommentNode);
       return scriptCommentNode;
-    } else {
-      if (__DEV__) {
-        warn(
-          type === 'module'
-            ? `Does not support "esm" module script in sandbox. "${src}"`
-            : `Invalid resource type "${type}", "${src}"`,
-        );
-      }
     }
     return this.el;
   }

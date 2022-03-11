@@ -8,6 +8,8 @@ declare global {
   interface Window {
     Garfish: Garfish;
     __GARFISH__: boolean;
+    __GAR__: boolean;
+    __PROWER_BY_GAR__: boolean;
   }
 }
 
@@ -52,8 +54,18 @@ function createContext(): Garfish {
 
   if (inBrowser()) {
     // Global flag
-    set('Garfish');
-    def(window, '__GARFISH__', true);
+    if (!(window.Gar && window.Gar.flag === __GARFISH_FLAG__)) {
+      def(window, 'Gar', GarfishInstance);
+    }
+    if (!(window.Garfish && window.Garfish.flag === __GARFISH_FLAG__)) {
+      def(window, 'Garfish', GarfishInstance);
+    }
+    if (!window.__PROWER_BY_GAR__) {
+      def(window, '__PROWER_BY_GAR__', true);
+    }
+    if (!window.__GAR__) {
+      def(window, '__GAR__', true);
+    }
   }
 
   if (fresh) {

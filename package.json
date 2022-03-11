@@ -8,9 +8,9 @@
     "build:docs": "pnpm run build --filter garfish-docs",
     "build:watch": "cross-env WATCH=true pnpm build",
     "test:e2e": "zx scripts/e2e.js",
+    "test:e2e:prod": "cross-env CI=true zx scripts/e2e.js",
     "test:e2e:open": "cross-env TEST_ENV_OPEN=true zx scripts/e2e.js",
-    "test": "node scripts/unit.js",
-    "test:cover": "node scripts/unit.js --coverage",
+    "test": "node scripts/unit.js --collect-coverage",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "changeset": "npx changeset",
@@ -23,8 +23,7 @@
     "format:js": "prettier --write --parser typescript \"(packages|scripts)/**/*.js\"",
     "format:md": "prettier --write \"**/*.md\"",
     "release": "node ./scripts/release.js",
-    "release:canary": "node ./scripts/release.js --canary",
-    "postinstall": "husky install"
+    "release:canary": "node ./scripts/release.js --canary"
   },
   "lint-staged": {
     "*.js": [
@@ -44,43 +43,39 @@
   "author": "bytedance",
   "license": "MIT",
   "devDependencies": {
-    "@babel/plugin-transform-regenerator": "7.16.0",
-    "@babel/preset-env": "7.16.4",
-    "@babel/preset-typescript": "7.16.0",
     "@jsdevtools/version-bump-prompt": "6.1.0",
     "@koa/cors": "3.1.0",
     "@ls-lint/ls-lint": "1.10.0",
+    "@testing-library/jest-dom": "^5.16.2",
     "@types/jest": "27.0.2",
     "@typescript-eslint/eslint-plugin": "5.4.0",
     "@typescript-eslint/parser": "5.4.0",
-    "@vue/cli-plugin-babel": "4.5.15",
-    "@vue/cli-plugin-eslint": "4.5.15",
-    "@vue/cli-service": "4.5.15",
     "axios": "0.24.0",
     "babel-polyfill": "6.26.0",
     "chalk": "4.1.2",
+    "codecov": "^3.8.3",
     "cross-env": "7.0.3",
-    "cypress": "8.7.0",
+    "cypress": "^9.5.0",
+    "dayjs": "^1.10.8",
     "esbuild-plugin-replace": "1.0.7",
     "eslint": "7.32.0",
-    "eslint-plugin-vue": "7.19.1",
     "execa": "4.1.0",
     "fs-extra": "10.0.0",
     "http-server": "13.0.2",
     "husky": "7.0.4",
     "install": "0.13.0",
+    "isomorphic-fetch": "^3.0.0",
     "jest": "27.3.1",
     "jest-fetch-mock": "^3.0.3",
     "kill-port": "1.6.1",
-    "koa": "2.13.4",
-    "koa-route": "3.2.0",
     "lint-staged": "11.2.6",
     "lodash": "4.17.21",
     "minimist": "1.2.5",
-    "pnpm": "6.23.2",
+    "pnpm": "^6.32.1",
     "prettier": "2.4.1",
     "prettier-eslint-cli": "5.0.1",
     "rimraf": "3.0.2",
+    "semver": "^7.3.5",
     "ts-jest": "27.0.7",
     "tslib": "2.3.1",
     "tsup": "5.7.2",
@@ -90,7 +85,7 @@
     "zx": "4.2.0"
   },
   "engines": {
-    "node": ">=14.13.0"
+    "node": ">=16.10.0"
   },
-  "version": "1.2.5"
+  "version": "1.4.1"
 }
